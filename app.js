@@ -123,7 +123,7 @@ let UIController = (function () {
                         <div class="right clearfix">
                             <div class="item__value">${obj.value}</div>
                             <div class="item__delete">
-                                <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                <button class="item__delete--btn"><i class="fas fa-minus-circle"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -136,7 +136,7 @@ let UIController = (function () {
                             <div class="item__value">${obj.value}</div>
                             <div class="item__percentage">21%</div>
                             <div class="item__delete">
-                                <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                <button class="item__delete--btn"><i class="fas fa-minus-circle"></i></button>
                             </div>
                         </div>
                     </div>`;
