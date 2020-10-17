@@ -132,7 +132,32 @@ let UIController = (function () {
         expensesLabel: ".budget__expenses--value",
         percentageLabel: ".budget__expenses--percentage",
         container: ".container",
-        expensesPercLabel: ".item__percentage"
+        expensesPercLabel: ".item__percentage",
+        dateLabel: ".budget__title--month"
+    };
+
+    let formatNumber = function(num, type) {
+        // + or - before number
+        // exactly 2 decimals points
+        // comma seperating the thousands
+        num = Math.abs(num);
+        num = num.toFixed(2);
+        let numSplit = num.split(".");
+        let int = numSplit[0];
+        let dec = numSplit[1];
+        if (int.length > 3) {
+            int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, 3);
+        }
+
+        let sign = type === "exp" ? "-" : "+";
+
+        return sign + " " + int + "." + dec;
+    };
+
+    let nodeListForEach = function(list, callBack) {
+        for (let i = 0; i < list.length; i++) {
+            callBack(list[i], i);
+        }
     };
 
     return {
@@ -157,7 +182,7 @@ let UIController = (function () {
                     `<div class="item clearfix" id="inc-${obj.id}">
                         <div class="item__description">${obj.description}</div>
                         <div class="right clearfix">
-                            <div class="item__value">${obj.value}</div>
+                            <div class="item__value">${formatNumber(obj.value, type)}</div>
                             <div class="item__delete">
                                 <button class="item__delete--btn"><i class="fas fa-minus-circle"></i></button>
                             </div>
@@ -169,7 +194,7 @@ let UIController = (function () {
                     `<div class="item clearfix" id="exp-${obj.id}">
                         <div class="item__description">${obj.description}</div>
                         <div class="right clearfix">
-                            <div class="item__value">${obj.value}</div>
+                            <div class="item__value">${formatNumber(obj.value, type)}</div>
                             <div class="item__percentage">21%</div>
                             <div class="item__delete">
                                 <button class="item__delete--btn"><i class="fas fa-minus-circle"></i></button>
@@ -199,9 +224,10 @@ let UIController = (function () {
         },
 
         displayBudget: function(obj) {
-            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
-            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
-            document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp;
+            let type = obj.budget > 0 ? "inc" : "exp";
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type);
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, "inc");
+            document.querySelector(DOMstrings.expensesLabel).textContent = formatNumber(obj.totalExp, "exp");
             
             if (obj.percentage > 0) {
                 document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + "%";
@@ -213,12 +239,6 @@ let UIController = (function () {
         displayPercentages: function(percentages) {
             let fields = document.querySelectorAll(DOMstrings.expensesPercLabel);
 
-            let nodeListForEach = function(list, callBack) {
-                for (let i = 0; i < list.length; i++) {
-                    callBack(list[i], i);
-                }
-            };
-
             nodeListForEach(fields, function(current, index) {
                 if (percentages[index] > 0) {
                     current.textContent = percentages[index] + "%";
@@ -226,6 +246,29 @@ let UIController = (function () {
                     current.textContent = "--";
                 }
             });
+        },
+
+        displayMonth: function() {
+            let now = new Date();
+            let year = now.getFullYear();
+
+            let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let month = now.getMonth();
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ", " + year;
+        },
+
+        changedType: function() {
+            let fields = document.querySelectorAll(
+                DOMstrings.inputType + ", " + 
+                DOMstrings.inputDescription + ", " + 
+                DOMstrings.inputValue
+            );
+
+            nodeListForEach(fields, function(current) {
+                current.classList.toggle("red-focus");
+            });
+
+            document.querySelector(DOMstrings.inputBtn).classList.toggle("red");
         }
     };
 
@@ -244,6 +287,8 @@ let controller = (function (budgetCtrl, UICtrl) {
         });
 
         document.querySelector(DOM.container).addEventListener("click", ctrlDeleteItem);
+
+        document.querySelector(DOM.inputType).addEventListener("change", UICtrl.changedType);
     };
 
     let updateBudget = function() {
@@ -317,6 +362,7 @@ let controller = (function (budgetCtrl, UICtrl) {
     return {
         init: function () {
             console.log("Application has started.");
+            UICtrl.displayMonth();
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,
