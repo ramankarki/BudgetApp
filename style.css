@@ -253,6 +253,7 @@ h2 {
     background: none;
     border: none;
     cursor: pointer;
+    display: inline-block;
     vertical-align: middle;
     display: none;
 }
