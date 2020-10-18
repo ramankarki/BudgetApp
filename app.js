@@ -145,13 +145,23 @@ let UIController = (function () {
         let numSplit = num.split(".");
         let int = numSplit[0];
         let dec = numSplit[1];
+
+        let formatInt = "";
         if (int.length > 3) {
-            int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, 3);
+            let three = int.slice(int.length - 3, int.length);
+            formatInt = "," + three + formatInt;
+            int = int.slice(0, int.length-3);
+            while (int.length > 2) {
+                let two = int.slice(int.length-2, int.length);
+                formatInt = "," + two + formatInt;
+                int = int.slice(0, int.length - 2);
+            }
         }
 
+        formatInt = int + formatInt;
         let sign = type === "exp" ? "-" : "+";
 
-        return sign + " " + int + "." + dec;
+        return sign + " " + formatInt + "." + dec;
     };
 
     let nodeListForEach = function(list, callBack) {
